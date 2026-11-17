@@ -25,3 +25,5 @@ Runtime audit 0. Advisory picomatch GHSA-fc5q-39xc-vjpf còn ở tooling Vite/Vi
 M3 catalog API 3/3, Playwright catalog 2/2 đạt. Kiểm tra manager/staff, sort allowlist, Decimal JSON, low-stock filter, PATCH không reset trường, adjustment retry cùng key và concurrent stock cuối. Playwright tự tạo/migrate/seed sales_e2e_test, chạy API 3001 và Vite 5174, giữ môi trường native độc lập.
 
 M4 business 8/8 đạt cho rounding/caps/zero, thời hạn [start,end), giá đổi, cấm giá client/duplicate cart lines, khóa phiên staff, manager account protection, phone normalization và promotion PATCH. Playwright form khách/ưu đãi/nhân viên 1/1 đạt.
+
+M5 checkout 6/6 đạt. Trigger test trong DB _test cố ý từ chối ghi Payment sau giảm tồn để xác nhận rollback toàn bộ. Có ca tranh tồn cuối, same-key concurrency, request khác key cũ, price change, insufficient cash và ownership ID/key. Playwright POS 3/3 đạt, gồm CSS print/window.print stub, mobile, bank xác nhận/khách/khuyến mại và route.fetch rồi abort để mô phỏng mất response sau commit; reload recovery mở đúng invoice cũ.

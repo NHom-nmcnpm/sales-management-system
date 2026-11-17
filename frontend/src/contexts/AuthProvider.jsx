@@ -26,7 +26,6 @@ export function AuthProvider({ children }) {
   }
   async function logout() {
     await api.post('/auth/logout', {});
-    if (user) sessionStorage.removeItem(`pos-pending-${user.id}`);
     clearSession();
   }
   return <AuthContext.Provider value={{ user, loading, login, logout, clearSession, setUser }}>{children}</AuthContext.Provider>;

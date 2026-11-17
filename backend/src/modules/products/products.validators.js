@@ -12,5 +12,6 @@ export const productCreate = productFields.extend({ description: productFields.s
 export const productUpdate = productFields.partial().extend({ isActive: z.boolean().optional() }).refine(value => Object.keys(value).length > 0);
 export const productQuery = listQuerySchema(['name', 'sku', 'price', 'stock', 'createdAt']).extend({
   categoryId: z.uuid().optional(), isActive: activeSchema,
+  sellable: z.enum(['true']).optional(),
   stockStatus: z.enum(['low', 'out', 'available']).optional()
 });

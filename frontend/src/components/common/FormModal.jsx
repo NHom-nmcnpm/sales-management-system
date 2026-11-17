@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Modal } from '../ui/dialog.jsx';
 import { Button } from '../ui/button.jsx';
 
-export function FormModal({ title, description, onClose, onSubmit, children, submitLabel = 'Lưu thông tin', wide = false }) {
+export function FormModal({ title, description, onClose, onSubmit, children, submitLabel = 'Lưu thông tin', submitDisabled = false, wide = false }) {
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState(null);
   const summary = useRef(null);
@@ -14,7 +14,7 @@ export function FormModal({ title, description, onClose, onSubmit, children, sub
       requestAnimationFrame(() => summary.current?.focus());
     } finally { setBusy(false); }
   }
-  return <Modal open onOpenChange={open => { if (!open && !busy) onClose(); }} title={title} description={description} className={wide ? 'wide' : ''}><form onSubmit={submit} className="form-stack">{failure && <div ref={summary} tabIndex={-1} className="form-alert" role="alert">{failure.message}</div>}{children(failure?.fields ?? {})}<div className="form-actions"><Button variant="outline" disabled={busy} onClick={onClose}>Hủy</Button><Button type="submit" disabled={busy}>{busy ? 'Đang lưu…' : submitLabel}</Button></div></form></Modal>;
+  return <Modal open onOpenChange={open => { if (!open && !busy) onClose(); }} title={title} description={description} className={wide ? 'wide' : ''}><form onSubmit={submit} className="form-stack">{failure && <div ref={summary} tabIndex={-1} className="form-alert" role="alert">{failure.message}</div>}{children(failure?.fields ?? {})}<div className="form-actions"><Button variant="outline" disabled={busy} onClick={onClose}>Hủy</Button><Button type="submit" disabled={busy || submitDisabled}>{busy ? 'Đang xử lý…' : submitLabel}</Button></div></form></Modal>;
 }
 
 export function ConfirmDialog({ title, description, onConfirm, onClose }) {

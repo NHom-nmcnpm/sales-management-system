@@ -4,7 +4,7 @@ import { HttpError } from '../../utilities/http-error.js';
 
 export function productFilter(query, user) {
   const where = { OR: [{ name: { contains: query.q, mode: 'insensitive' } }, { sku: { contains: query.q, mode: 'insensitive' } }] };
-  if (user.role === 'STAFF') { where.isActive = true; where.category = { isActive: true }; }
+  if (user.role === 'STAFF' || query.sellable === 'true') { where.isActive = true; where.category = { isActive: true }; }
   else if (query.isActive) where.isActive = query.isActive === 'true';
   if (query.categoryId) where.categoryId = query.categoryId;
   if (query.stockStatus === 'out') where.stock = 0;

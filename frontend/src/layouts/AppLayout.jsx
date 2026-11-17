@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { Store, UserRound, LogOut, Menu, X, ChevronRight, ShieldCheck, Package, Folders, Warehouse, UsersRound, ContactRound, TicketPercent } from 'lucide-react';
+import { Store, UserRound, LogOut, Menu, X, ChevronRight, ShieldCheck, Package, Folders, Warehouse, UsersRound, ContactRound, TicketPercent, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../contexts/auth.js';
 import { useToast } from '../contexts/toast.js';
 import { Button } from '../components/ui/button.jsx';
 
 const navigation = [
+  { to: '/ban-hang', label: 'Bán hàng', icon: ShoppingBag },
   { to: '/san-pham', label: 'Sản phẩm', icon: Package },
   { to: '/danh-muc', label: 'Danh mục', icon: Folders, manager: true },
   { to: '/ton-kho', label: 'Tồn kho', icon: Warehouse, manager: true },

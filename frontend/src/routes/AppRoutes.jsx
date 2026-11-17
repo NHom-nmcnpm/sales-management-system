@@ -11,6 +11,9 @@ import { InventoryPage } from '../pages/InventoryPage.jsx';
 import { EmployeesPage } from '../pages/EmployeesPage.jsx';
 import { CustomersPage } from '../pages/CustomersPage.jsx';
 import { PromotionsPage } from '../pages/PromotionsPage.jsx';
+import { PosPage } from '../pages/PosPage.jsx';
+import { InvoicePage } from '../pages/InvoicePage.jsx';
+import { CartProvider } from '../contexts/CartProvider.jsx';
 
 export function ProtectedRoute({ manager = false }) {
   const { user, loading } = useAuth();
@@ -21,5 +24,33 @@ export function ProtectedRoute({ manager = false }) {
 }
 
 export function AppRoutes() {
-  return <Routes><Route path="/dang-nhap" element={<LoginPage />} /><Route element={<ProtectedRoute />}><Route element={<AppLayout />}><Route index element={<Navigate to="/ho-so" replace />} /><Route path="/ho-so" element={<ProfilePage />} /><Route path="/san-pham" element={<ProductsPage />} /><Route path="/khach-hang" element={<CustomersPage />} /><Route element={<ProtectedRoute manager />}><Route path="/danh-muc" element={<CategoriesPage />} /><Route path="/ton-kho" element={<InventoryPage />} /><Route path="/ton-kho/lich-su" element={<InventoryPage movements />} /><Route path="/nhan-vien" element={<EmployeesPage />} /><Route path="/khuyen-mai" element={<PromotionsPage />} /></Route><Route path="/khong-co-quyen" element={<StatusPage forbidden />} /><Route path="*" element={<StatusPage />} /></Route></Route></Routes>;
+  return (
+    <Routes>
+      <Route path="/dang-nhap" element={<LoginPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<CartProvider><AppLayout /></CartProvider>}>
+          <Route index element={<HomeRedirect />} />
+          <Route path="/ho-so" element={<ProfilePage />} />
+          <Route path="/ban-hang" element={<PosPage />} />
+          <Route path="/hoa-don/:id" element={<InvoicePage />} />
+          <Route path="/san-pham" element={<ProductsPage />} />
+          <Route path="/khach-hang" element={<CustomersPage />} />
+          <Route element={<ProtectedRoute manager />}>
+            <Route path="/danh-muc" element={<CategoriesPage />} />
+            <Route path="/ton-kho" element={<InventoryPage />} />
+            <Route path="/ton-kho/lich-su" element={<InventoryPage movements />} />
+            <Route path="/nhan-vien" element={<EmployeesPage />} />
+            <Route path="/khuyen-mai" element={<PromotionsPage />} />
+          </Route>
+          <Route path="/khong-co-quyen" element={<StatusPage forbidden />} />
+          <Route path="*" element={<StatusPage />} />
+        </Route>
+      </Route>
+    </Routes>
+  );
+}
+
+function HomeRedirect() {
+  const { user } = useAuth();
+  return <Navigate to={user.role === 'MANAGER' ? '/ho-so' : '/ban-hang'} replace />;
 }

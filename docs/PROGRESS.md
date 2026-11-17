@@ -7,7 +7,7 @@
 | M2 | Hoàn thành | Backend 8/8, Playwright auth 3/3 (hai vai trò, reload, logout, mobile/keyboard), build/lint đạt |
 | M3 | Hoàn thành | Catalog API 3/3, Playwright 2/2, build/lint. Điều chỉnh cùng key/concurrent và tranh tồn cuối đúng |
 | M4 | Hoàn thành | Business 8/8, Playwright form 1/1, build/lint. Decimal rounding/caps/time boundaries, khóa phiên, quyền và phone normalization đạt |
-| M5 | Chờ M4 | POS/hóa đơn/in |
+| M5 | Hoàn thành | Checkout API 6/6; Playwright POS 3/3 (cash/in/mobile, customer/promo/transfer, lost-response recovery); build/lint đạt |
 | M6 | Chờ M5 | Dashboard/report |
 | M7 | Chờ M6 | QA và bàn giao |
 
@@ -26,3 +26,7 @@ M2 phát hiện và sửa lỗi thứ tự nạp env khiến integration fixture
 M2 push 11126bd. M3 có catalog/inventory routes, controllers, services, validators; list tìm/lọc/sort/page, staff scope, PATCH giữ trường không gửi, ngừng hoạt động và movement ledger. UI bảng dùng lại, form dialog, xác nhận và filter URL. Playwright dùng sales_e2e_test và cổng 3001/5174 tách native 3000/5173, migrate/seed tự động.
 
 M3 push e5a437b. M4 hoàn thiện employees/customers/promotions và sales/quote, form quản trị có phản hồi/field errors, seed thêm 6 khách và 2 chương trình. Quote dùng giá DB, kiểm tra hoạt động/tồn/khách/ưu đãi, Decimal ROUND_HALF_UP và fingerprint snapshot. Playwright chờ navigation/logout hoàn tất trước chuyển trang/tài khoản để tránh hủy request của fixture.
+
+M4 push 08141cc. M5 checkout Serializable với từng bước ghi rõ, thanh toán ghi cuối để mọi lỗi sau giảm tồn rollback toàn bộ. Invoice/key ownership được test, by-request luôn gắn current user kể cả manager. POS có cart theo user trong sessionStorage, khóa cart khi chưa rõ kết quả, recovery GET key rồi retry cùng payload/key. In hóa đơn dùng window.print và CSS print A4. Các ca Playwright đã kiểm tra media print và mô phỏng response mất sau commit.
+
+pg 8 có cảnh báo deprecation về client.query concurrency từ truy vấn quan hệ trong Prisma adapter. Query hiện được driver xếp hàng, tests atomic/concurrency đạt. Lockfile giữ pg 8, xem lại tương thích khi nâng Prisma/pg major.

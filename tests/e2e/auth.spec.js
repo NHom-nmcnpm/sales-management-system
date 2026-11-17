@@ -6,6 +6,8 @@ for (const role of ['MANAGER', 'STAFF']) {
     await page.getByLabel('Email', { exact: true }).fill(process.env[`SEED_${role}_EMAIL`]);
     await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env[`SEED_${role}_PASSWORD`]);
     await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click();
+    await page.waitForURL(url => url.pathname !== '/dang-nhap' && url.pathname !== '/');
+    await page.goto('/ho-so');
     await expect(page.getByRole('heading', { name: 'Hồ sơ cá nhân', exact: true })).toBeVisible();
     await page.reload();
     await expect(page.getByRole('heading', { name: 'Hồ sơ cá nhân', exact: true })).toBeVisible();
