@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -8,6 +8,10 @@ import { env } from './config/env.js';
 import { HttpError } from './utilities/http-error.js';
 import { errorHandler } from './middlewares/error-handler.js';
 import authRoutes from './modules/auth/auth.routes.js';
+import categoriesRoutes from './modules/categories/categories.routes.js';
+import productsRoutes from './modules/products/products.routes.js';
+import inventoryRoutes from './modules/inventory/inventory.routes.js';
+import { authenticate, csrfProtection } from './middlewares/authenticate.js';
 
 export const app = express();
 app.use(helmet());
@@ -29,5 +33,11 @@ app.get('/api/v1/health/ready', async (_request, response, next) => {
   } catch { next(new HttpError(503, 'UNAVAILABLE', 'Database tạm thời chưa sẵn sàng.')); }
 });
 app.use('/api/v1/auth', authRoutes);
+const protectedRoutes = Router();
+protectedRoutes.use(authenticate, csrfProtection);
+protectedRoutes.use('/categories', categoriesRoutes);
+protectedRoutes.use('/products', productsRoutes);
+protectedRoutes.use('/inventory', inventoryRoutes);
+app.use('/api/v1', protectedRoutes);
 app.use((_request, _response, next) => next(new HttpError(404, 'NOT_FOUND', 'Không tìm thấy API.')));
 app.use(errorHandler);

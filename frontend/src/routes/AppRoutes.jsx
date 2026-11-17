@@ -5,6 +5,9 @@ import { AppLayout } from '../layouts/AppLayout.jsx';
 import { LoginPage } from '../pages/LoginPage.jsx';
 import { ProfilePage } from '../pages/ProfilePage.jsx';
 import { StatusPage } from '../pages/StatusPage.jsx';
+import { ProductsPage } from '../pages/ProductsPage.jsx';
+import { CategoriesPage } from '../pages/CategoriesPage.jsx';
+import { InventoryPage } from '../pages/InventoryPage.jsx';
 
 export function ProtectedRoute({ manager = false }) {
   const { user, loading } = useAuth();
@@ -15,5 +18,5 @@ export function ProtectedRoute({ manager = false }) {
 }
 
 export function AppRoutes() {
-  return <Routes><Route path="/dang-nhap" element={<LoginPage />} /><Route element={<ProtectedRoute />}><Route element={<AppLayout />}><Route index element={<Navigate to="/ho-so" replace />} /><Route path="/ho-so" element={<ProfilePage />} /><Route path="/khong-co-quyen" element={<StatusPage forbidden />} /><Route path="*" element={<StatusPage />} /></Route></Route></Routes>;
+  return <Routes><Route path="/dang-nhap" element={<LoginPage />} /><Route element={<ProtectedRoute />}><Route element={<AppLayout />}><Route index element={<Navigate to="/ho-so" replace />} /><Route path="/ho-so" element={<ProfilePage />} /><Route path="/san-pham" element={<ProductsPage />} /><Route element={<ProtectedRoute manager />}><Route path="/danh-muc" element={<CategoriesPage />} /><Route path="/ton-kho" element={<InventoryPage />} /><Route path="/ton-kho/lich-su" element={<InventoryPage movements />} /></Route><Route path="/khong-co-quyen" element={<StatusPage forbidden />} /><Route path="*" element={<StatusPage />} /></Route></Route></Routes>;
 }

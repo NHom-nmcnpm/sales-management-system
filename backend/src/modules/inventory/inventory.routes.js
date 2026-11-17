@@ -1,0 +1,12 @@
+import { Router } from 'express';
+import { requireManager } from '../../middlewares/authenticate.js';
+import { requireIdempotencyKey, validate } from '../../middlewares/validate.js';
+import { productQuery } from '../products/products.validators.js';
+import { adjustmentSchema, movementQuery } from './inventory.validators.js';
+import * as controller from './inventory.controller.js';
+const router = Router();
+router.use(requireManager);
+router.get('/', validate(productQuery, 'query'), controller.list);
+router.get('/movements', validate(movementQuery, 'query'), controller.movements);
+router.post('/adjustments', requireIdempotencyKey, validate(adjustmentSchema), controller.adjust);
+export default router;

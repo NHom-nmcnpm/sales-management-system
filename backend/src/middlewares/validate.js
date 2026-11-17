@@ -1,4 +1,5 @@
 import { HttpError } from '../utilities/http-error.js';
+import { z } from 'zod';
 
 export function validate(schema, target = 'body') {
   return (request, _response, next) => {
@@ -15,4 +16,11 @@ export function validate(schema, target = 'body') {
     request.validated[target] = result.data;
     next();
   };
+}
+
+export function requireIdempotencyKey(request, _response, next) {
+  const result = z.uuid().safeParse(request.get('Idempotency-Key'));
+  if (!result.success) throw new HttpError(400, 'INVALID_KEY', 'Idempotency-Key phải là UUID hợp lệ.');
+  request.idempotencyKey = result.data;
+  next();
 }
