@@ -55,6 +55,19 @@ export async function seedDatabase() {
         } });
       }
     }
+    const customers = [
+      ['Nguyễn Thu Hà', '0901000001', 'Quận 3, TP. Hồ Chí Minh'],
+      ['Lê Quốc Bảo', '0901000002', 'Bình Thạnh, TP. Hồ Chí Minh'],
+      ['Phạm Ngọc Linh', '0901000003', 'Thủ Đức, TP. Hồ Chí Minh'],
+      ['Trần Gia Huy', '0901000004', 'Quận 7, TP. Hồ Chí Minh'],
+      ['Võ Minh Thư', '0901000005', 'Tân Bình, TP. Hồ Chí Minh'],
+      ['Công ty An Phát', '0901000006', 'Quận 1, TP. Hồ Chí Minh']
+    ];
+    for (const [name, phone, address] of customers) await transaction.customer.upsert({ where: { phone }, update: {}, create: { name, phone, address } });
+    const startsAt = new Date(Date.now() - 365 * 86400000);
+    const endsAt = new Date(Date.now() + 365 * 86400000);
+    await transaction.promotion.upsert({ where: { code: 'CHAO10' }, update: {}, create: { code: 'CHAO10', name: 'Ưu đãi mua sắm 10%', discountType: 'PERCENT', discountValue: '10', minSubtotal: '100000', maxDiscount: '50000', startsAt, endsAt } });
+    await transaction.promotion.upsert({ where: { code: 'TIETKIEM20' }, update: {}, create: { code: 'TIETKIEM20', name: 'Giảm 20.000đ cho đơn từ 250.000đ', discountType: 'FIXED', discountValue: '20000', minSubtotal: '250000', startsAt, endsAt } });
     return { users: users.length, products: catalog.length };
   });
 }

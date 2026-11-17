@@ -1,0 +1,36 @@
+import { test, expect } from '@playwright/test';
+import { randomBytes } from 'node:crypto';
+import { login } from './helpers.js';
+
+test('staff records customer and manager maintains promotions and staff', async ({ page }) => {
+  const suffix = Date.now();
+  await login(page, 'STAFF');
+  await page.goto('/khach-hang');
+  await page.getByRole('button', { name: 'Thêm khách hàng', exact: true }).click();
+  await page.getByLabel('Tên khách hàng', { exact: true }).fill(`Khách E2E ${suffix}`);
+  await page.getByLabel('Số điện thoại', { exact: true }).fill(`09${String(suffix).slice(-8)}`);
+  await page.getByRole('button', { name: 'Lưu thông tin', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.getByRole('textbox', { name: 'Tìm kiếm', exact: true }).fill(`Khách E2E ${suffix}`);
+  await expect(page.getByText(`Khách E2E ${suffix}`, { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Đăng xuất', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Đăng nhập', exact: true })).toBeVisible();
+  await login(page);
+  await page.goto('/khuyen-mai');
+  await page.getByRole('button', { name: 'Thêm khuyến mại', exact: true }).click();
+  await page.getByLabel('Tên chương trình', { exact: true }).fill(`Ưu đãi E2E ${suffix}`);
+  await page.getByLabel('Mã ưu đãi', { exact: true }).fill(`E2E${suffix}`);
+  await page.getByLabel('Giá trị giảm', { exact: true }).fill('12.5');
+  await page.getByRole('button', { name: 'Lưu thông tin', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.getByRole('textbox', { name: 'Tìm kiếm', exact: true }).fill(`E2E${suffix}`);
+  await expect(page.getByText(`Ưu đãi E2E ${suffix}`, { exact: true })).toBeVisible();
+  await page.goto('/nhan-vien');
+  await page.getByRole('button', { name: 'Thêm nhân viên', exact: true }).click();
+  await page.getByLabel('Họ và tên', { exact: true }).fill(`Nhân viên E2E ${suffix}`);
+  await page.getByLabel('Email', { exact: true }).fill(`e2e-${suffix}@example.test`);
+  await page.getByLabel('Mật khẩu ban đầu', { exact: true }).fill(randomBytes(18).toString('hex'));
+  await page.getByRole('button', { name: 'Lưu thông tin', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.getByText(`Nhân viên E2E ${suffix}`, { exact: true })).toBeVisible();
+});

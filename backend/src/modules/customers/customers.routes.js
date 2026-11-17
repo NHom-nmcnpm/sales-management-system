@@ -1,0 +1,12 @@
+import { Router } from 'express';
+import { requireManager } from '../../middlewares/authenticate.js';
+import { validate } from '../../middlewares/validate.js';
+import { idParams } from '../../utilities/list-query.js';
+import { customerCreate, customerUpdate, customerQuery } from './customers.validators.js';
+import * as controller from './customers.controller.js';
+const router = Router();
+router.get('/', validate(customerQuery, 'query'), controller.list);
+router.get('/:id', validate(idParams, 'params'), controller.detail);
+router.post('/', validate(customerCreate), controller.create);
+router.patch('/:id', requireManager, validate(idParams, 'params'), validate(customerUpdate), controller.update);
+export default router;

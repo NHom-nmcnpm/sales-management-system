@@ -6,7 +6,7 @@
 | M1 | Hoàn thành | Migration fresh ở sales và sales_test; seed 2 vai trò/16 sản phẩm; tests 4/4 (unique, FK, âm, rollback, seed lặp và ledger), lint đạt |
 | M2 | Hoàn thành | Backend 8/8, Playwright auth 3/3 (hai vai trò, reload, logout, mobile/keyboard), build/lint đạt |
 | M3 | Hoàn thành | Catalog API 3/3, Playwright 2/2, build/lint. Điều chỉnh cùng key/concurrent và tranh tồn cuối đúng |
-| M4 | Chờ M3 | Nhân viên/khách/ưu đãi |
+| M4 | Hoàn thành | Business 8/8, Playwright form 1/1, build/lint. Decimal rounding/caps/time boundaries, khóa phiên, quyền và phone normalization đạt |
 | M5 | Chờ M4 | POS/hóa đơn/in |
 | M6 | Chờ M5 | Dashboard/report |
 | M7 | Chờ M6 | QA và bàn giao |
@@ -24,3 +24,5 @@ M1 push 21cd274. M2 hoàn thiện JWT/session 8h, HttpOnly cookie, CSRF, Origin/
 M2 phát hiện và sửa lỗi thứ tự nạp env khiến integration fixtures dùng kết nối DB phát triển. DB này chỉ chứa demo của lượt triển khai và đã seed lại. Setup hiện đặt TEST_DATABASE_URL trước import config; helper kiểm tra current_database() khớp DB _test trước mọi cleanup. Toàn bộ 8 ca backend được chạy lại và đạt với bảo vệ mới. Playwright login hai vai trò đạt sau đó.
 
 M2 push 11126bd. M3 có catalog/inventory routes, controllers, services, validators; list tìm/lọc/sort/page, staff scope, PATCH giữ trường không gửi, ngừng hoạt động và movement ledger. UI bảng dùng lại, form dialog, xác nhận và filter URL. Playwright dùng sales_e2e_test và cổng 3001/5174 tách native 3000/5173, migrate/seed tự động.
+
+M3 push e5a437b. M4 hoàn thiện employees/customers/promotions và sales/quote, form quản trị có phản hồi/field errors, seed thêm 6 khách và 2 chương trình. Quote dùng giá DB, kiểm tra hoạt động/tồn/khách/ưu đãi, Decimal ROUND_HALF_UP và fingerprint snapshot. Playwright chờ navigation/logout hoàn tất trước chuyển trang/tài khoản để tránh hủy request của fixture.

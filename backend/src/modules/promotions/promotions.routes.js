@@ -1,0 +1,12 @@
+import { Router } from 'express';
+import { requireManager } from '../../middlewares/authenticate.js';
+import { validate } from '../../middlewares/validate.js';
+import { idParams } from '../../utilities/list-query.js';
+import { promotionCreate, promotionUpdate, promotionQuery } from './promotions.validators.js';
+import * as controller from './promotions.controller.js';
+const router = Router();
+router.use(requireManager);
+router.get('/', validate(promotionQuery, 'query'), controller.list);
+router.post('/', validate(promotionCreate), controller.create);
+router.patch('/:id', validate(idParams, 'params'), validate(promotionUpdate), controller.update);
+export default router;

@@ -23,3 +23,5 @@ Runtime audit 0. Advisory picomatch GHSA-fc5q-39xc-vjpf còn ở tooling Vite/Vi
 8 backend tests đạt, gồm constraints/seed/rollback và auth/CSRF/session/password/rate limit. Playwright auth 3/3 đạt cho hai vai trò và mobile keyboard. Test setup nạp .env rồi gán DATABASE_URL test trước import config. Cleanup xác minh current_database() khớp tên TEST_DATABASE_URL và kết thúc _test, chặn nhầm database ở tầng kết nối thực tế.
 
 M3 catalog API 3/3, Playwright catalog 2/2 đạt. Kiểm tra manager/staff, sort allowlist, Decimal JSON, low-stock filter, PATCH không reset trường, adjustment retry cùng key và concurrent stock cuối. Playwright tự tạo/migrate/seed sales_e2e_test, chạy API 3001 và Vite 5174, giữ môi trường native độc lập.
+
+M4 business 8/8 đạt cho rounding/caps/zero, thời hạn [start,end), giá đổi, cấm giá client/duplicate cart lines, khóa phiên staff, manager account protection, phone normalization và promotion PATCH. Playwright form khách/ưu đãi/nhân viên 1/1 đạt.

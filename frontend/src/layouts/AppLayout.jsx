@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { Store, UserRound, LogOut, Menu, X, ChevronRight, ShieldCheck, Package, Folders, Warehouse } from 'lucide-react';
+import { Store, UserRound, LogOut, Menu, X, ChevronRight, ShieldCheck, Package, Folders, Warehouse, UsersRound, ContactRound, TicketPercent } from 'lucide-react';
 import { useAuth } from '../contexts/auth.js';
 import { useToast } from '../contexts/toast.js';
 import { Button } from '../components/ui/button.jsx';
@@ -9,6 +9,9 @@ const navigation = [
   { to: '/san-pham', label: 'Sản phẩm', icon: Package },
   { to: '/danh-muc', label: 'Danh mục', icon: Folders, manager: true },
   { to: '/ton-kho', label: 'Tồn kho', icon: Warehouse, manager: true },
+  { to: '/khach-hang', label: 'Khách hàng', icon: ContactRound },
+  { to: '/khuyen-mai', label: 'Khuyến mại', icon: TicketPercent, manager: true },
+  { to: '/nhan-vien', label: 'Nhân viên', icon: UsersRound, manager: true },
   { to: '/ho-so', label: 'Hồ sơ cá nhân', icon: UserRound }
 ];
 
