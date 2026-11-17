@@ -6,5 +6,5 @@ dotenv.config({ path: fileURLToPath(new URL('../.env', import.meta.url)), quiet:
 export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: { path: 'prisma/migrations', seed: 'node prisma/seed.js' },
-  datasource: { url: process.env.DATABASE_URL }
+  datasource: { url: process.env.DATABASE_URL },
 });

@@ -1,9 +1,12 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, request } from '@playwright/test';
 import { login } from './helpers.js';
 
 async function addProduct(page, sku) {
   await page.getByRole('textbox', { name: 'Tìm sản phẩm', exact: true }).fill(sku);
-  await page.getByRole('button', { name: /^Thêm / }).filter({ hasText: sku }).click();
+  await page
+    .getByRole('button', { name: /^Thêm / })
+    .filter({ hasText: sku })
+    .click();
   await expect(page.getByRole('button', { name: 'Thanh toán', exact: true })).toBeEnabled();
 }
 
@@ -18,7 +21,11 @@ test('cash guest sale, receipt print and mobile layout', async ({ page }) => {
   await page.getByRole('button', { name: 'Xác nhận và lập hóa đơn', exact: true }).click();
   await expect(page.getByRole('heading', { name: /^Hóa đơn HD-/ })).toBeVisible();
   await expect(page.locator('.invoice-payment')).toContainText('10.000');
-  await page.evaluate(() => { window.print = () => { window.__printed = true; }; });
+  await page.evaluate(() => {
+    window.print = () => {
+      window.__printed = true;
+    };
+  });
   await page.getByRole('button', { name: 'In hóa đơn', exact: true }).click();
   expect(await page.evaluate(() => window.__printed)).toBe(true);
   await page.emulateMedia({ media: 'print' });
@@ -28,7 +35,9 @@ test('cash guest sale, receipt print and mobile layout', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto('/ban-hang');
   await expect(page.getByRole('heading', { name: 'Bán hàng', exact: true })).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  );
 });
 
 test('customer and promotion sale with explicitly confirmed transfer', async ({ page }) => {
@@ -39,13 +48,20 @@ test('customer and promotion sale with explicitly confirmed transfer', async ({ 
   await expect(page.getByRole('button', { name: 'Thanh toán', exact: true })).toBeEnabled();
   await page.getByLabel('Tìm khách hàng', { exact: true }).fill('Nguyễn Thu Hà');
   await page.getByRole('button', { name: /Nguyễn Thu Hà/ }).click();
-  const promotionOption = page.getByLabel('Khuyến mại', { exact: true }).locator('option').filter({ hasText: 'CHAO10' });
+  const promotionOption = page
+    .getByLabel('Khuyến mại', { exact: true })
+    .locator('option')
+    .filter({ hasText: 'CHAO10' });
   await expect(promotionOption).toHaveCount(1);
-  await page.getByLabel('Khuyến mại', { exact: true }).selectOption(await promotionOption.getAttribute('value'));
+  await page
+    .getByLabel('Khuyến mại', { exact: true })
+    .selectOption(await promotionOption.getAttribute('value'));
   await expect(page.locator('.grand-total strong')).toHaveText('160.200 ₫');
   await page.getByRole('button', { name: 'Thanh toán', exact: true }).click();
   await page.getByLabel('Hình thức thanh toán', { exact: true }).selectOption('BANK_TRANSFER');
-  await expect(page.getByRole('button', { name: 'Xác nhận và lập hóa đơn', exact: true })).toBeDisabled();
+  await expect(
+    page.getByRole('button', { name: 'Xác nhận và lập hóa đơn', exact: true }),
+  ).toBeDisabled();
   await page.getByLabel('Mã tham chiếu chuyển khoản', { exact: true }).fill('E2E-TRANSFER');
   await page.getByRole('checkbox').check();
   await page.getByRole('button', { name: 'Xác nhận và lập hóa đơn', exact: true }).click();
@@ -58,8 +74,11 @@ test('recovers a committed sale after losing the response and reloading', async 
   await page.goto('/ban-hang');
   await addProduct(page, 'VP-B002');
   let recordedId;
-  await page.route('**/api/v1/invoices', async route => {
-    if (route.request().method() !== 'POST') { await route.continue(); return; }
+  await page.route('**/api/v1/invoices', async (route) => {
+    if (route.request().method() !== 'POST') {
+      await route.continue();
+      return;
+    }
     const response = await route.fetch();
     recordedId = (await response.json()).data.id;
     await route.abort('connectionreset');
@@ -72,4 +91,43 @@ test('recovers a committed sale after losing the response and reloading', async 
   await page.getByRole('button', { name: 'Kiểm tra giao dịch', exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/hoa-don/${recordedId}$`));
   await expect(page.locator('.invoice-sheet')).toBeVisible();
+});
+
+test('requires confirmation for a changed price and preserves the cash actually entered', async ({
+  page,
+}) => {
+  const admin = await request.newContext({
+    baseURL: 'http://localhost:5174',
+    extraHTTPHeaders: { Origin: 'http://localhost:5174' },
+  });
+  const loginResponse = await admin.post('/api/v1/auth/login', {
+    data: { email: process.env.SEED_MANAGER_EMAIL, password: process.env.SEED_MANAGER_PASSWORD },
+  });
+  const csrfToken = (await loginResponse.json()).data.csrfToken;
+  const product = (await (await admin.get('/api/v1/products?q=VP-B001')).json()).data[0];
+  try {
+    await login(page, 'STAFF');
+    await page.goto('/ban-hang');
+    await addProduct(page, 'VP-B001');
+    await page.getByRole('button', { name: 'Thanh toán', exact: true }).click();
+    await page.getByLabel('Tiền khách đưa (VND)', { exact: true }).fill('20000');
+    const changed = await admin.patch(`/api/v1/products/${product.id}`, {
+      headers: { 'X-CSRF-Token': csrfToken },
+      data: { price: '6000' },
+    });
+    expect(changed.status()).toBe(200);
+    await page.getByRole('button', { name: 'Xác nhận và lập hóa đơn', exact: true }).click();
+    await expect(page.getByRole('alert')).toContainText('thay đổi');
+    await expect(page.getByLabel('Tiền khách đưa (VND)', { exact: true })).toHaveValue('20000');
+    await expect(page.locator('.payment-total strong')).toHaveText('6.000 ₫');
+    await page.getByRole('button', { name: 'Xác nhận và lập hóa đơn', exact: true }).click();
+    await expect(page.locator('.invoice-payment')).toContainText('20.000');
+    await expect(page.locator('.invoice-payment')).toContainText('14.000');
+  } finally {
+    await admin.patch(`/api/v1/products/${product.id}`, {
+      headers: { 'X-CSRF-Token': csrfToken },
+      data: { price: product.price },
+    });
+    await admin.dispose();
+  }
 });

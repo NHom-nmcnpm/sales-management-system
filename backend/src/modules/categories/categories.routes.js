@@ -7,5 +7,11 @@ import * as controller from './categories.controller.js';
 const router = Router();
 router.get('/', validate(categoryQuery, 'query'), controller.list);
 router.post('/', requireManager, validate(categoryCreate), controller.create);
-router.patch('/:id', requireManager, validate(idParams, 'params'), validate(categoryUpdate), controller.update);
+router.patch(
+  '/:id',
+  requireManager,
+  validate(idParams, 'params'),
+  validate(categoryUpdate),
+  controller.update,
+);
 export default router;

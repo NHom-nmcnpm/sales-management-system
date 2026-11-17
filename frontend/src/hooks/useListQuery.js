@@ -14,9 +14,19 @@ export function useListQuery(defaultSort = 'createdAt') {
   }
   function sort(name) {
     const next = new URLSearchParams(params);
-    const direction = query.get('sortBy') === name && query.get('sortOrder') === 'asc' ? 'desc' : 'asc';
-    next.set('sortBy', name); next.set('sortOrder', direction); next.delete('page');
+    const direction =
+      query.get('sortBy') === name && query.get('sortOrder') === 'asc' ? 'desc' : 'asc';
+    next.set('sortBy', name);
+    next.set('sortOrder', direction);
+    next.delete('page');
     setParams(next, { replace: true });
   }
-  return { queryString: query.toString(), get: name => params.get(name) ?? '', update, sort, sortBy: query.get('sortBy'), sortOrder: query.get('sortOrder') };
+  return {
+    queryString: query.toString(),
+    get: (name) => params.get(name) ?? '',
+    update,
+    sort,
+    sortBy: query.get('sortBy'),
+    sortOrder: query.get('sortOrder'),
+  };
 }

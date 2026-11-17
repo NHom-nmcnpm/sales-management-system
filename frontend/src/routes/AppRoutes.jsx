@@ -18,8 +18,12 @@ import { CartProvider } from '../contexts/CartProvider.jsx';
 import { InvoicesPage } from '../pages/InvoicesPage.jsx';
 import { CustomerDetailPage } from '../pages/CustomerDetailPage.jsx';
 
-const DashboardPage = lazy(() => import('../pages/DashboardPage.jsx').then(module => ({ default: module.DashboardPage })));
-const ReportsPage = lazy(() => import('../pages/ReportsPage.jsx').then(module => ({ default: module.ReportsPage })));
+const DashboardPage = lazy(() =>
+  import('../pages/DashboardPage.jsx').then((module) => ({ default: module.DashboardPage })),
+);
+const ReportsPage = lazy(() =>
+  import('../pages/ReportsPage.jsx').then((module) => ({ default: module.ReportsPage })),
+);
 
 export function ProtectedRoute({ manager = false }) {
   const { user, loading } = useAuth();
@@ -34,7 +38,13 @@ export function AppRoutes() {
     <Routes>
       <Route path="/dang-nhap" element={<LoginPage />} />
       <Route element={<ProtectedRoute />}>
-        <Route element={<CartProvider><AppLayout /></CartProvider>}>
+        <Route
+          element={
+            <CartProvider>
+              <AppLayout />
+            </CartProvider>
+          }
+        >
           <Route index element={<HomeRedirect />} />
           <Route path="/ho-so" element={<ProfilePage />} />
           <Route path="/ban-hang" element={<PosPage />} />

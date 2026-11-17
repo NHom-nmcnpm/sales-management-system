@@ -1,26 +1,55 @@
 services:
   db:
-    image: postgres:17.12-bookworm
+    image: postgres:17.12-bookworm@sha256:40865bc877a289da75963d97d72b59633f639fc5af7a4e856bfa3714cae5b536
     environment:
       POSTGRES_USER: ${POSTGRES_USER:?Run npm run env:init}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run npm run env:init}
       POSTGRES_DB: ${POSTGRES_DB:-sales}
     ports:
-      - "127.0.0.1:${POSTGRES_PORT:-15432}:5432"
+      - '127.0.0.1:${POSTGRES_PORT:-15432}:5432'
     volumes:
       - sales_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 5s
       timeout: 5s
       retries: 20
+  app:
+    build: .
+    init: true
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      APP_ORIGIN: http://localhost:8080
+      COOKIE_SECURE: 'false'
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-sales}
+    ports:
+      - '127.0.0.1:8080:3000'
+    command: ['sh', '-c', 'npm run db:migrate -w backend && npm start -w backend']
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/v1/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 10
   smoke:
     profiles: [tools]
     build: .
     env_file: .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-sales}
-    command: ["npm", "run", "db:smoke"]
+    command: ['npm', 'run', 'db:smoke']
     depends_on:
       db:
         condition: service_healthy

@@ -21,14 +21,93 @@ export function CustomersPage() {
   const [editing, setEditing] = useState(null);
   const [confirming, setConfirming] = useState(null);
   const columns = [
-    { key: 'name', label: 'Khách hàng', sortable: true, render: row => <div className="product-cell"><span className="avatar">{row.name.charAt(0)}</span>{manager ? <Link className="text-link inline-link" to={`/khach-hang/${row.id}`}>{row.name}</Link> : <strong>{row.name}</strong>}</div> },
-    { key: 'phone', label: 'Điện thoại', sortable: true, render: row => row.phone || '—' },
-    { key: 'email', label: 'Email', render: row => row.email || '—' },
-    { key: 'address', label: 'Địa chỉ', render: row => row.address || '—' }
+    {
+      key: 'name',
+      label: 'Khách hàng',
+      sortable: true,
+      render: (row) => (
+        <div className="product-cell">
+          <span className="avatar">{row.name.charAt(0)}</span>
+          {manager ? (
+            <Link className="text-link inline-link" to={`/khach-hang/${row.id}`}>
+              {row.name}
+            </Link>
+          ) : (
+            <strong>{row.name}</strong>
+          )}
+        </div>
+      ),
+    },
+    { key: 'phone', label: 'Điện thoại', sortable: true, render: (row) => row.phone || '—' },
+    { key: 'email', label: 'Email', render: (row) => row.email || '—' },
+    { key: 'address', label: 'Địa chỉ', render: (row) => row.address || '—' },
   ];
-  if (manager) columns.push({ key: 'actions', label: 'Thao tác', render: row => <div className="row-actions"><span className={`badge ${row.isActive ? 'green' : 'gray'}`}>{row.isActive ? 'Hoạt động' : 'Đã ngừng'}</span><button className="icon-button" aria-label={`Sửa ${row.name}`} onClick={() => setEditing(row)}><Pencil size={16} /></button><button className="icon-button" aria-label={`Đổi trạng thái ${row.name}`} onClick={() => setConfirming(row)}><Power size={16} /></button></div> });
-  return <><PageHeading title="Khách hàng" description="Thông tin liên hệ để chăm sóc và phục vụ khách hàng." action={<Button onClick={() => setEditing({})}><Plus size={17} />Thêm khách hàng</Button>} /><section className="panel"><TableToolbar query={query} placeholder="Tìm tên hoặc số điện thoại…">{manager && <ActiveFilter query={query} />}</TableToolbar><DataTable resource={resource} columns={columns} query={query} /></section>
-    {editing && <CustomerForm customer={editing} onClose={() => setEditing(null)} onSaved={() => { resource.reload(); notify('Đã lưu khách hàng.'); }} />}
-    {confirming && <ConfirmDialog title="Thay đổi trạng thái khách hàng?" description="Thông tin giao dịch trước đây được lưu trong hóa đơn." onClose={() => setConfirming(null)} onConfirm={async () => { await api.patch(`/customers/${confirming.id}`, { isActive: !confirming.isActive }); resource.reload(); notify('Đã cập nhật trạng thái khách hàng.'); }} />}
-  </>;
+  if (manager)
+    columns.push({
+      key: 'actions',
+      label: 'Thao tác',
+      render: (row) => (
+        <div className="row-actions">
+          <span className={`badge ${row.isActive ? 'green' : 'gray'}`}>
+            {row.isActive ? 'Hoạt động' : 'Đã ngừng'}
+          </span>
+          <button
+            className="icon-button"
+            aria-label={`Sửa ${row.name}`}
+            onClick={() => setEditing(row)}
+          >
+            <Pencil size={16} />
+          </button>
+          <button
+            className="icon-button"
+            aria-label={`Đổi trạng thái ${row.name}`}
+            onClick={() => setConfirming(row)}
+          >
+            <Power size={16} />
+          </button>
+        </div>
+      ),
+    });
+  return (
+    <>
+      <PageHeading
+        title="Khách hàng"
+        description="Thông tin liên hệ để chăm sóc và phục vụ khách hàng."
+        action={
+          <Button onClick={() => setEditing({})}>
+            <Plus size={17} />
+            Thêm khách hàng
+          </Button>
+        }
+      />
+      <section className="panel">
+        <TableToolbar query={query} placeholder="Tìm tên hoặc số điện thoại…">
+          {manager && <ActiveFilter query={query} />}
+        </TableToolbar>
+        <DataTable resource={resource} columns={columns} query={query} />
+      </section>
+      {editing && (
+        <CustomerForm
+          customer={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            resource.reload();
+            notify('Đã lưu khách hàng.');
+          }}
+        />
+      )}
+      {confirming && (
+        <ConfirmDialog
+          title="Thay đổi trạng thái khách hàng?"
+          description="Thông tin giao dịch trước đây được lưu trong hóa đơn."
+          onClose={() => setConfirming(null)}
+          onConfirm={async () => {
+            await api.patch(`/customers/${confirming.id}`, { isActive: !confirming.isActive });
+            resource.reload();
+            notify('Đã cập nhật trạng thái khách hàng.');
+          }}
+        />
+      )}
+    </>
+  );
 }

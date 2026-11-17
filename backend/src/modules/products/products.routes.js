@@ -8,5 +8,11 @@ const router = Router();
 router.get('/', validate(productQuery, 'query'), controller.list);
 router.get('/:id', validate(idParams, 'params'), controller.detail);
 router.post('/', requireManager, validate(productCreate), controller.create);
-router.patch('/:id', requireManager, validate(idParams, 'params'), validate(productUpdate), controller.update);
+router.patch(
+  '/:id',
+  requireManager,
+  validate(idParams, 'params'),
+  validate(productUpdate),
+  controller.update,
+);
 export default router;

@@ -30,6 +30,8 @@
 
 Kiểm tra bằng `npm run lint`, `npm run build`, `npm test`, `npm run test:e2e`.
 
+Bản build native dùng `npm start` sau build. Docker dùng `docker compose up -d --build --wait app` và seed bằng lệnh riêng. Cổng DB 15432, native 3000/5173, Docker 8080, E2E 3001/5174. Không dùng database phát triển để chạy fixture; trước cleanup phải xác nhận tên database thực tế kết thúc `_test` và khớp cấu hình test.
+
 ## Quy trình
 
 - Theo kế hoạch M0–M7 trong docs/PLAN.md. Cập nhật docs/PROGRESS.md cùng source mỗi milestone.

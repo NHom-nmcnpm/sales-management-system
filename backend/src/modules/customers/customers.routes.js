@@ -7,8 +7,20 @@ import { invoiceQuery } from '../invoices/invoices.validators.js';
 import * as controller from './customers.controller.js';
 const router = Router();
 router.get('/', validate(customerQuery, 'query'), controller.list);
-router.get('/:id/invoices', requireManager, validate(idParams, 'params'), validate(invoiceQuery, 'query'), controller.invoices);
+router.get(
+  '/:id/invoices',
+  requireManager,
+  validate(idParams, 'params'),
+  validate(invoiceQuery, 'query'),
+  controller.invoices,
+);
 router.get('/:id', validate(idParams, 'params'), controller.detail);
 router.post('/', validate(customerCreate), controller.create);
-router.patch('/:id', requireManager, validate(idParams, 'params'), validate(customerUpdate), controller.update);
+router.patch(
+  '/:id',
+  requireManager,
+  validate(idParams, 'params'),
+  validate(customerUpdate),
+  controller.update,
+);
 export default router;

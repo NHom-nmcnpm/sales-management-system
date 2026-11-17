@@ -2,14 +2,14 @@
 
 Prefix /api/v1. JSON, tiền là chuỗi số nguyên VND, timestamp ISO 8601. OpenAPI trong backend là contract chính, được triển khai cùng các module.
 
-| Nhóm | Paths |
-| --- | --- |
-| Auth | /auth/login, /auth/logout, /auth/me, /auth/csrf, /auth/profile, /auth/change-password |
-| Dữ liệu | /employees, /categories, /products, /customers, /promotions |
-| Kho | /inventory, /inventory/movements, /inventory/adjustments |
-| Bán hàng | /sales/quote, /invoices, /invoices/:id, /invoices/by-request/:key |
-| Báo cáo | /reports/overview, /reports/revenue, /reports/products |
-| Health | /health/live, /health/ready |
+| Nhóm     | Paths                                                                                 |
+| -------- | ------------------------------------------------------------------------------------- |
+| Auth     | /auth/login, /auth/logout, /auth/me, /auth/csrf, /auth/profile, /auth/change-password |
+| Dữ liệu  | /employees, /categories, /products, /customers, /promotions                           |
+| Kho      | /inventory, /inventory/movements, /inventory/adjustments                              |
+| Bán hàng | /sales/quote, /invoices, /invoices/:id, /invoices/by-request/:key                     |
+| Báo cáo  | /reports/overview, /reports/revenue, /reports/products                                |
+| Health   | /health/live, /health/ready                                                           |
 
 List query q/page/pageSize/sortBy/sortOrder và bộ lọc module. Mặc định 20, tối đa 100. Response data/pagination. Lỗi code/message/fieldErrors/requestId, mã HTTP 400/401/403/404/409/429/500/503.
 
@@ -24,3 +24,25 @@ Employees chỉ quản lý STAFF; khóa hoặc reset password thu hồi session.
 POST /invoices nhận cart giống quote, quoteHash và payment. CASH có cashReceived (chuỗi VND). BANK_TRANSFER có confirmed=true và transferReference tùy chọn. UUID Idempotency-Key bắt buộc. Lần đầu 201, replay đúng nội dung 200/replayed=true, cùng key khác nội dung 409. By-request lookup luôn có createdById=current user, kể cả MANAGER. GET invoice ID cho manager đọc toàn bộ, staff chỉ của mình. Response loại requestHash và idempotencyKey nội bộ. Quote cũ trả 409 QUOTE_CHANGED. Invoice/payment/items/stock/movement được commit hoặc rollback cùng nhau.
 
 Reports chỉ MANAGER. from/to định dạng YYYY-MM-DD, to bao gồm cả ngày, mặc định đầu tháng hiện tại đến hôm nay. Revenue groupBy=day/month/year, periods thiếu bằng zero. Product report sortBy=quantity/subtotal/name, search/pagination; quantity và subtotal tổng hợp dạng chuỗi để giữ chính xác. Subtotal sản phẩm là trước giảm toàn hóa đơn. Customer detail MANAGER có summary invoiceCount/totalSpent/lastPurchaseAt và GET /customers/:id/invoices. Staff chỉ nhận thông tin cơ bản, không đọc lịch sử/tổng chi tiêu toàn khách.
+
+## Contract OpenAPI
+
+Contract được cung cấp tại GET /api/v1/openapi.json, Swagger UI /api/v1/docs/ (MANAGER). Mở trên cùng Origin giao diện, đăng nhập trước. Try it out lấy CSRF tự động. File nguồn backend/src/config/openapi.js sử dụng Zod validators làm schema input, có query/path/header, payload, response data/pagination, security schemes và các lỗi nghiệp vụ.
+
+| Method | Endpoint ngoài CRUD                                    | Nội dung                                       |
+| ------ | ------------------------------------------------------ | ---------------------------------------------- |
+| POST   | /auth/login                                            | email/password → user/CSRF + cookie            |
+| GET    | /auth/me, /auth/csrf                                   | Khôi phục phiên và token chống CSRF            |
+| POST   | /auth/logout, /auth/change-password                    | Thu hồi phiên                                  |
+| PATCH  | /auth/profile                                          | name của chính mình                            |
+| POST   | /employees/:id/reset-password                          | password mới cho STAFF                         |
+| GET    | /inventory, /inventory/movements                       | Tồn và ledger                                  |
+| POST   | /inventory/adjustments                                 | productId/delta/reason, UUID key               |
+| POST   | /sales/quote                                           | items/customerId/promotionId                   |
+| POST   | /invoices                                              | cart/quoteHash/payment và UUID key             |
+| GET    | /invoices, /invoices/:id, /invoices/by-request/:key    | List/detail/recovery theo quyền                |
+| GET    | /customers/:id/invoices                                | Lịch sử toàn khách, MANAGER                    |
+| GET    | /reports/overview, /reports/revenue, /reports/products | KPI, doanh thu và sản phẩm                     |
+| GET    | /health/live, /health/ready                            | Health công khai, dữ liệu trạng thái tối thiểu |
+
+CRUD categories/products/customers/employees/promotions có GET list, POST create, PATCH :id. Detail GET :id cho products/customers/employees. Tất cả bảo vệ session, write cần Origin/CSRF và JSON. Schema từ chối trường ngoài allowlist, backend giữ giá/thanh toán/tồn. POST adjustment trả 201 cả khi replay bản ghi cũ; invoice trả 201 lần đầu, 200 khi replay. Body lỗi chứa requestId trùng X-Request-Id.

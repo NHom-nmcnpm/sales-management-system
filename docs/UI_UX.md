@@ -11,3 +11,11 @@ Primary #1D4ED8, nền #F8FAFC, card trắng, chữ #0F172A, success green/warni
 Sidebar/header/breadcrumb. Bảng tìm/lọc/sort/pagination giữ URL. Form label/error rõ, dialog focus và xác nhận thao tác quan trọng. Loading skeleton, empty state và error retry. Desktop POS hai cột, mobile giỏ dễ mở và tổng tiền/action hiển thị rõ.
 
 QA 375/768/1280/1440, bàn phím, focus, giảm chuyển động và tương phản. Hóa đơn có CSS print, chỉ vùng nội dung hóa đơn hiển thị khi window.print().
+
+## Cài đặt thực tế
+
+Font Be Vietnam Pro đóng gói local, màu primary qua semantic token. Các label/metadata dùng màu tương phản rõ hơn sau review. Form native có label liên kết ID và lỗi qua aria-describedby, summary lỗi được focus. Zod locale Việt cho lỗi validation. Modal Radix trap focus/ESC và trả focus về thao tác trước.
+
+Mobile sidebar hỗ trợ ESC, aria-expanded/controls và inert để nội dung ẩn không nhận focus. Touch actions tăng hit area. POS mobile có thanh giỏ ở đáy và cuộn đến cart, trường thanh toán/phím số phù hợp. Bảng giới hạn cuộn ngang trong panel. Invoice print A4 giữ bảng/tổng tiền và ẩn các controls.
+
+Dashboard có bốn KPI, line revenue và horizontal bar sản phẩm bán chạy, recent invoices. Reports có tab revenue/products, date range, group day/month/year, bảng sort/search/pagination. Chart có bảng/số liệu chi tiết để đọc bằng bàn phím và đối chiếu.

@@ -13,7 +13,10 @@ test('manager creates category/product, searches and adjusts stock', async ({ pa
   await page.getByRole('button', { name: 'Thêm sản phẩm', exact: true }).click();
   await page.getByLabel('Tên sản phẩm', { exact: true }).fill(`Sổ E2E ${suffix}`);
   await page.getByLabel('Mã SKU', { exact: true }).fill(`E2E-${suffix}`);
-  await page.getByLabel('Danh mục', { exact: true }).last().selectOption({ label: `E2E ${suffix}` });
+  await page
+    .getByLabel('Danh mục', { exact: true })
+    .last()
+    .selectOption({ label: `E2E ${suffix}` });
   await page.getByLabel('Giá bán (VND)', { exact: true }).fill('45000');
   await page.getByRole('button', { name: 'Lưu thông tin', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);

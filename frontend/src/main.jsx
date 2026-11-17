@@ -11,5 +11,13 @@ import { ToastProvider } from './contexts/ToastProvider.jsx';
 import { AppRoutes } from './routes/AppRoutes.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode><BrowserRouter><ToastProvider><AuthProvider><AppRoutes /></AuthProvider></ToastProvider></BrowserRouter></React.StrictMode>
+  <React.StrictMode>
+    <BrowserRouter>
+      <ToastProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </ToastProvider>
+    </BrowserRouter>
+  </React.StrictMode>,
 );

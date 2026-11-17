@@ -11,12 +11,21 @@ export function AuthProvider({ children }) {
   }, []);
   useEffect(() => {
     const controller = new AbortController();
-    api.get('/auth/me', { signal: controller.signal }).then(({ data }) => {
-      setUser(data.data.user);
-      setCsrfToken(data.data.csrfToken);
-    }).catch(() => {}).finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    api
+      .get('/auth/me', { signal: controller.signal })
+      .then(({ data }) => {
+        setUser(data.data.user);
+        setCsrfToken(data.data.csrfToken);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
     window.addEventListener('session-expired', clearSession);
-    return () => { controller.abort(); window.removeEventListener('session-expired', clearSession); };
+    return () => {
+      controller.abort();
+      window.removeEventListener('session-expired', clearSession);
+    };
   }, [clearSession]);
   async function login(credentials) {
     const { data } = await api.post('/auth/login', credentials);
@@ -28,5 +37,9 @@ export function AuthProvider({ children }) {
     await api.post('/auth/logout', {});
     clearSession();
   }
-  return <AuthContext.Provider value={{ user, loading, login, logout, clearSession, setUser }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, loading, login, logout, clearSession, setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }

@@ -6,14 +6,16 @@ for (const role of ['MANAGER', 'STAFF']) {
     await page.getByLabel('Email', { exact: true }).fill(process.env[`SEED_${role}_EMAIL`]);
     await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env[`SEED_${role}_PASSWORD`]);
     await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click();
-    await page.waitForURL(url => url.pathname !== '/dang-nhap' && url.pathname !== '/');
+    await page.waitForURL((url) => url.pathname !== '/dang-nhap' && url.pathname !== '/');
     await page.goto('/ho-so');
     await expect(page.getByRole('heading', { name: 'Hồ sơ cá nhân', exact: true })).toBeVisible();
     await page.reload();
     await expect(page.getByRole('heading', { name: 'Hồ sơ cá nhân', exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Đăng xuất', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Đăng nhập', exact: true })).toBeVisible();
-    expect(await page.context().cookies()).not.toEqual(expect.arrayContaining([expect.objectContaining({ name: 'sales_session' })]));
+    expect(await page.context().cookies()).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ name: 'sales_session' })]),
+    );
   });
 }
 
@@ -28,5 +30,7 @@ test('mobile login and keyboard focus', async ({ page }) => {
   await page.getByRole('button', { name: 'Đăng nhập', exact: true }).click();
   await page.getByRole('button', { name: 'Mở menu' }).click();
   await expect(page.getByRole('navigation')).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  );
 });
