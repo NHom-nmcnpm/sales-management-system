@@ -16,6 +16,7 @@ import customersRoutes from './modules/customers/customers.routes.js';
 import promotionsRoutes from './modules/promotions/promotions.routes.js';
 import salesRoutes from './modules/sales/sales.routes.js';
 import invoicesRoutes from './modules/invoices/invoices.routes.js';
+import reportsRoutes from './modules/reports/reports.routes.js';
 import { authenticate, csrfProtection } from './middlewares/authenticate.js';
 
 export const app = express();
@@ -48,6 +49,7 @@ protectedRoutes.use('/customers', customersRoutes);
 protectedRoutes.use('/promotions', promotionsRoutes);
 protectedRoutes.use('/sales', salesRoutes);
 protectedRoutes.use('/invoices', invoicesRoutes);
+protectedRoutes.use('/reports', reportsRoutes);
 app.use('/api/v1', protectedRoutes);
 app.use((_request, _response, next) => next(new HttpError(404, 'NOT_FOUND', 'Không tìm thấy API.')));
 app.use(errorHandler);

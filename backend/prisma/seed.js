@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { pathToFileURL } from 'node:url';
 import { prisma } from '../src/prisma/client.js';
 import { withTransaction } from '../src/utilities/transaction.js';
+import { seedDemoSales } from './seed-sales.js';
 
 const catalog = [
   ['Bút viết', 'VP-B001', 'Bút bi Thiên Long TL-027', 'Cây', '5000', 180],
@@ -75,6 +76,7 @@ export async function seedDatabase() {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
     const result = await seedDatabase();
-    console.log(`Seed hoàn tất: ${result.users} tài khoản, ${result.products} sản phẩm. Dữ liệu hiện có được giữ nguyên.`);
+    const sales = await seedDemoSales();
+    console.log(`Seed hoàn tất: ${result.users} tài khoản, ${result.products} sản phẩm, ${sales} hóa đơn demo mới. Dữ liệu hiện có được giữ nguyên.`);
   } finally { await prisma.$disconnect(); }
 }

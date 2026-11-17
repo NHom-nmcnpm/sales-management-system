@@ -27,3 +27,5 @@ M3 catalog API 3/3, Playwright catalog 2/2 đạt. Kiểm tra manager/staff, sor
 M4 business 8/8 đạt cho rounding/caps/zero, thời hạn [start,end), giá đổi, cấm giá client/duplicate cart lines, khóa phiên staff, manager account protection, phone normalization và promotion PATCH. Playwright form khách/ưu đãi/nhân viên 1/1 đạt.
 
 M5 checkout 6/6 đạt. Trigger test trong DB _test cố ý từ chối ghi Payment sau giảm tồn để xác nhận rollback toàn bộ. Có ca tranh tồn cuối, same-key concurrency, request khác key cũ, price change, insufficient cash và ownership ID/key. Playwright POS 3/3 đạt, gồm CSS print/window.print stub, mobile, bank xác nhận/khách/khuyến mại và route.fetch rồi abort để mô phỏng mất response sau commit; reload recovery mở đúng invoice cũ.
+
+M6 reports+sales 9/9 đạt. Revenue kiểm tra UTC 16:59:59.999/17:00 tương ứng biên ngày Việt Nam, tháng/năm, zero dates, invoice thiếu payment bị loại, product quantity/subtotal và customer lifetime totals. Seed 270 invoice lặp không trùng, payment count và ledger khớp. Playwright dashboard/report/customer 1/1 đối chiếu KPI với API, xem nhóm tháng/năm, product tab và customer detail.

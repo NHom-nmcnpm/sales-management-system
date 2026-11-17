@@ -45,21 +45,8 @@ export async function createInvoice(userId, idempotencyKey, input) {
       } else {
         payment = { method: 'BANK_TRANSFER', amount: total, change: '0', transferReference: input.payment.transferReference || null };
       }
-      const invoice = await transaction.invoice.create({ data: {
-        createdById: userId, customerId: normalized.customerId, promotionId: normalized.promotionId,
-        customerSnapshot: quote.customer, promotionSnapshot: quote.promotion ?? Prisma.JsonNull,
-        subtotal: quote.subtotal, discount: quote.discount, total: quote.total, idempotencyKey, requestHash
-      } });
-      const invoiceItems = [];
-      for (const item of quote.items) {
-        invoiceItems.push(await transaction.invoiceItem.create({ data: { ...item, invoiceId: invoice.id } }));
-        const updated = await transaction.product.updateMany({ where: { id: item.productId, isActive: true, stock: { gte: item.quantity } }, data: { stock: { decrement: item.quantity } } });
-        if (updated.count !== 1) throw new HttpError(409, 'INSUFFICIENT_STOCK', `${item.name} không còn đủ số lượng.`);
-        const product = await transaction.product.findUnique({ where: { id: item.productId }, select: { stock: true } });
-        await transaction.stockMovement.create({ data: { actorId: userId, productId: item.productId, invoiceId: invoice.id, kind: 'SALE', delta: -item.quantity, quantityAfter: product.stock, reason: `Bán hàng HD-${String(invoice.number).padStart(6, '0')}` } });
-      }
-      const recordedPayment = await transaction.payment.create({ data: { ...payment, invoiceId: invoice.id } });
-      return { invoice: presentInvoice({ ...invoice, items: invoiceItems, payment: recordedPayment, createdBy: { id: actor.id, name: actor.name } }), replayed: false };
+      const invoice = await recordSale(transaction, { actor, quote, payment, idempotencyKey, requestHash });
+      return { invoice, replayed: false };
     });
   } catch (error) {
     if (error.code === 'P2002') {
@@ -70,8 +57,27 @@ export async function createInvoice(userId, idempotencyKey, input) {
   }
 }
 
+// Internal writer shared by checkout and seed. Quote/payment must be verified before calling.
+export async function recordSale(transaction, { actor, quote, payment, idempotencyKey, requestHash, paidAt = new Date() }) {
+  const invoice = await transaction.invoice.create({ data: {
+    createdById: actor.id, customerId: quote.customer.id ?? null, promotionId: quote.promotion?.id ?? null,
+    customerSnapshot: quote.customer, promotionSnapshot: quote.promotion ?? Prisma.JsonNull,
+    subtotal: quote.subtotal, discount: quote.discount, total: quote.total, idempotencyKey, requestHash, paidAt
+  } });
+  const invoiceItems = [];
+  for (const item of quote.items) {
+    invoiceItems.push(await transaction.invoiceItem.create({ data: { ...item, invoiceId: invoice.id } }));
+    const updated = await transaction.product.updateMany({ where: { id: item.productId, isActive: true, stock: { gte: item.quantity } }, data: { stock: { decrement: item.quantity } } });
+    if (updated.count !== 1) throw new HttpError(409, 'INSUFFICIENT_STOCK', `${item.name} không còn đủ số lượng.`);
+    const product = await transaction.product.findUnique({ where: { id: item.productId }, select: { stock: true } });
+    await transaction.stockMovement.create({ data: { actorId: actor.id, productId: item.productId, invoiceId: invoice.id, kind: 'SALE', delta: -item.quantity, quantityAfter: product.stock, reason: `Bán hàng HD-${String(invoice.number).padStart(6, '0')}`, createdAt: paidAt } });
+  }
+  const recordedPayment = await transaction.payment.create({ data: { ...payment, invoiceId: invoice.id, createdAt: paidAt } });
+  return presentInvoice({ ...invoice, items: invoiceItems, payment: recordedPayment, createdBy: { id: actor.id, name: actor.name } });
+}
+
 export async function getInvoice(id, user) {
-  const invoice = await prisma.invoice.findFirst({ where: { id, ...(user.role === 'STAFF' ? { createdById: user.id } : {}) }, include: invoiceInclude });
+  const invoice = await prisma.invoice.findFirst({ where: { id, status: 'PAID', payment: { isNot: null }, ...(user.role === 'STAFF' ? { createdById: user.id } : {}) }, include: invoiceInclude });
   if (!invoice) throw new HttpError(404, 'NOT_FOUND', 'Không tìm thấy hóa đơn.');
   return presentInvoice(invoice);
 }

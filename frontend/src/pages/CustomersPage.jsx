@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Plus, Pencil, Power } from 'lucide-react';
 import { useAuth } from '../contexts/auth.js';
 import { useToast } from '../contexts/toast.js';
@@ -20,7 +21,7 @@ export function CustomersPage() {
   const [editing, setEditing] = useState(null);
   const [confirming, setConfirming] = useState(null);
   const columns = [
-    { key: 'name', label: 'Khách hàng', sortable: true, render: row => <div className="product-cell"><span className="avatar">{row.name.charAt(0)}</span><strong>{row.name}</strong></div> },
+    { key: 'name', label: 'Khách hàng', sortable: true, render: row => <div className="product-cell"><span className="avatar">{row.name.charAt(0)}</span>{manager ? <Link className="text-link inline-link" to={`/khach-hang/${row.id}`}>{row.name}</Link> : <strong>{row.name}</strong>}</div> },
     { key: 'phone', label: 'Điện thoại', sortable: true, render: row => row.phone || '—' },
     { key: 'email', label: 'Email', render: row => row.email || '—' },
     { key: 'address', label: 'Địa chỉ', render: row => row.address || '—' }

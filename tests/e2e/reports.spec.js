@@ -1,0 +1,31 @@
+import { test, expect } from '@playwright/test';
+import { login } from './helpers.js';
+import { money } from '../../frontend/src/utilities/format.js';
+
+test('dashboard, reports and customer history agree with real API data', async ({ page }) => {
+  await login(page);
+  await page.goto('/tong-quan');
+  await expect(page.getByRole('heading', { name: 'Tổng quan', exact: true })).toBeVisible();
+  const response = await page.request.get('/api/v1/reports/overview');
+  expect(response.ok()).toBe(true);
+  const overview = (await response.json()).data;
+  await expect(page.locator('.stat-card').filter({ hasText: 'Doanh thu' }).locator(':scope > strong')).toHaveText(money(overview.revenue));
+  await expect(page.locator('.recharts-surface').first()).toBeVisible();
+  await page.goto('/bao-cao');
+  await page.getByLabel('Nhóm thời gian', { exact: true }).selectOption('month');
+  await expect(page.getByRole('heading', { name: 'Doanh thu theo tháng', exact: true })).toBeVisible();
+  await expect(page.getByRole('tabpanel', { name: 'Bảng doanh thu' }).getByRole('table')).toBeVisible();
+  await page.getByLabel('Nhóm thời gian', { exact: true }).selectOption('year');
+  await expect(page.getByRole('heading', { name: 'Doanh thu theo năm', exact: true })).toBeVisible();
+  await page.getByRole('tab', { name: 'Sản phẩm bán ra', exact: true }).click();
+  await expect(page.getByRole('tabpanel', { name: 'Bảng sản phẩm bán ra' }).getByRole('table')).toBeVisible();
+  const customers = (await (await page.request.get('/api/v1/customers?q=Nguy%E1%BB%85n%20Thu%20H%C3%A0')).json()).data;
+  const customer = customers[0];
+  await page.goto(`/khach-hang/${customer.id}`);
+  await expect(page.getByRole('heading', { name: customer.name, exact: true })).toBeVisible();
+  const detail = (await (await page.request.get(`/api/v1/customers/${customer.id}`)).json()).data;
+  await expect(page.locator('.stat-card').filter({ hasText: 'Tổng chi tiêu' }).locator(':scope > strong')).toHaveText(money(detail.summary.totalSpent));
+  await page.goto('/hoa-don');
+  await expect(page.getByRole('heading', { name: 'Hóa đơn', exact: true })).toBeVisible();
+  await expect(page.getByRole('table')).toBeVisible();
+});

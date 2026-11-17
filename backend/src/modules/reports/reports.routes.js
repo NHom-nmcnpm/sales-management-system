@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { requireManager } from '../../middlewares/authenticate.js';
+import { validate } from '../../middlewares/validate.js';
+import { revenueQuery, productReportQuery } from './reports.validators.js';
+import * as controller from './reports.controller.js';
+const router = Router();
+router.use(requireManager);
+router.get('/overview', validate(revenueQuery, 'query'), controller.overview);
+router.get('/revenue', validate(revenueQuery, 'query'), controller.revenue);
+router.get('/products', validate(productReportQuery, 'query'), controller.products);
+export default router;

@@ -8,7 +8,7 @@
 | M3 | Hoàn thành | Catalog API 3/3, Playwright 2/2, build/lint. Điều chỉnh cùng key/concurrent và tranh tồn cuối đúng |
 | M4 | Hoàn thành | Business 8/8, Playwright form 1/1, build/lint. Decimal rounding/caps/time boundaries, khóa phiên, quyền và phone normalization đạt |
 | M5 | Hoàn thành | Checkout API 6/6; Playwright POS 3/3 (cash/in/mobile, customer/promo/transfer, lost-response recovery); build/lint đạt |
-| M6 | Chờ M5 | Dashboard/report |
+| M6 | Hoàn thành | Reports + checkout regression 9/9, Playwright dashboard/report/customer 1/1, lint/build; 270 invoice demo và ledger khớp |
 | M7 | Chờ M6 | QA và bàn giao |
 
 Kế hoạch và bổ sung được phê duyệt. Source app JavaScript/JSX. Generator prisma-client 7.10.1 chạy bằng native type stripping Node 24, mã sinh ignored. Đã kiểm chứng cùng pg adapter trên Windows và Docker Linux. JSX/Radix Button build được.
@@ -30,3 +30,7 @@ M3 push e5a437b. M4 hoàn thiện employees/customers/promotions và sales/quote
 M4 push 08141cc. M5 checkout Serializable với từng bước ghi rõ, thanh toán ghi cuối để mọi lỗi sau giảm tồn rollback toàn bộ. Invoice/key ownership được test, by-request luôn gắn current user kể cả manager. POS có cart theo user trong sessionStorage, khóa cart khi chưa rõ kết quả, recovery GET key rồi retry cùng payload/key. In hóa đơn dùng window.print và CSS print A4. Các ca Playwright đã kiểm tra media print và mô phỏng response mất sau commit.
 
 pg 8 có cảnh báo deprecation về client.query concurrency từ truy vấn quan hệ trong Prisma adapter. Query hiện được driver xếp hàng, tests atomic/concurrency đạt. Lockfile giữ pg 8, xem lại tương thích khi nâng Prisma/pg major.
+
+M5 push a9f6187. M6 có revenue day/month/year, zero periods, product ranking, overview, invoice history và customer lifetime stats. SQL report tham số hóa, group theo Asia/Ho_Chi_Minh; kỳ [from 00:00, to+1 00:00). Chỉ PAID có payment được cộng. Charts lazy-loaded, tooltip/totals dùng money string, Number chỉ dùng tọa độ đồ thị.
+
+Demo lịch sử seed: 270 hóa đơn của 90 ngày đã qua, identity cố định, anchor giữ từ lần đầu. Cùng transaction có nhập kho demo và bán, kết quả tồn giữ nguyên và ledger khớp. Seed lặp bỏ qua các invoice đã có; database có giao dịch thật/điều chỉnh thủ công liên quan sẽ giữ nguyên lịch sử thay vì chèn hồi tố. Native đã seed 270, E2E có giao dịch kiểm thử nên lịch sử demo được bỏ qua đúng guard.

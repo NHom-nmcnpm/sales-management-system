@@ -1,18 +1,22 @@
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { Store, UserRound, LogOut, Menu, X, ChevronRight, ShieldCheck, Package, Folders, Warehouse, UsersRound, ContactRound, TicketPercent, ShoppingBag } from 'lucide-react';
+import { Store, UserRound, LogOut, Menu, X, ChevronRight, ShieldCheck, Package, Folders, Warehouse, UsersRound, ContactRound, TicketPercent, ShoppingBag, LayoutDashboard, ReceiptText, ChartNoAxesCombined } from 'lucide-react';
+import { Loading } from '../components/common/States.jsx';
 import { useAuth } from '../contexts/auth.js';
 import { useToast } from '../contexts/toast.js';
 import { Button } from '../components/ui/button.jsx';
 
 const navigation = [
+  { to: '/tong-quan', label: 'Tổng quan', icon: LayoutDashboard, manager: true },
   { to: '/ban-hang', label: 'Bán hàng', icon: ShoppingBag },
+  { to: '/hoa-don', label: 'Hóa đơn', icon: ReceiptText },
   { to: '/san-pham', label: 'Sản phẩm', icon: Package },
   { to: '/danh-muc', label: 'Danh mục', icon: Folders, manager: true },
   { to: '/ton-kho', label: 'Tồn kho', icon: Warehouse, manager: true },
   { to: '/khach-hang', label: 'Khách hàng', icon: ContactRound },
   { to: '/khuyen-mai', label: 'Khuyến mại', icon: TicketPercent, manager: true },
   { to: '/nhan-vien', label: 'Nhân viên', icon: UsersRound, manager: true },
+  { to: '/bao-cao', label: 'Báo cáo', icon: ChartNoAxesCombined, manager: true },
   { to: '/ho-so', label: 'Hồ sơ cá nhân', icon: UserRound }
 ];
 
@@ -38,7 +42,7 @@ export function AppLayout() {
       <div className="sidebar-bottom"><div className="avatar">{user.name.charAt(0)}</div><div className="sidebar-user"><strong>{user.name}</strong><span>{roleLabel}</span></div><button className="icon-button" onClick={handleLogout} aria-label="Đăng xuất"><LogOut size={18} /></button></div>
     </aside>
     <div className="main-shell"><header className="topbar"><div className="breadcrumbs"><button className="mobile-menu icon-button" onClick={() => setMenuOpen(true)} aria-label="Mở menu" aria-expanded={menuOpen}><Menu size={21} /></button><span>Cửa hàng</span><ChevronRight size={14} aria-hidden="true" /><strong>{current?.label ?? 'Chi tiết'}</strong></div><div className="topbar-user"><span className="role-pill">{roleLabel}</span><Button asChild variant="ghost" size="icon"><Link to="/ho-so" aria-label="Hồ sơ cá nhân"><UserRound size={20} /></Link></Button></div></header>
-      <main id="main-content" className="page-content"><Outlet /></main>
+      <main id="main-content" className="page-content"><Suspense fallback={<Loading />}><Outlet /></Suspense></main>
       <footer className="app-footer"><span>Sổ Bán Hàng</span><span>Đơn vị tiền tệ VND · Giờ Việt Nam</span></footer>
     </div>
   </div>;
