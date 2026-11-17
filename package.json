@@ -1,0 +1,30 @@
+{
+  "name": "sales-management-system",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": ["frontend", "backend"],
+  "engines": { "node": ">=24.12.0 <25" },
+  "scripts": {
+    "dev": "concurrently -k -n API,WEB \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "lint": "eslint .",
+    "test": "npm run test -w backend",
+    "test:e2e": "playwright test",
+    "db:generate": "npm run db:generate -w backend",
+    "db:migrate": "npm run db:migrate -w backend",
+    "db:dev": "npm run db:dev -w backend",
+    "db:seed": "npm run db:seed -w backend",
+    "db:smoke": "npm run db:smoke -w backend",
+    "env:init": "node scripts/init-env.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.0",
+    "@playwright/test": "^1.56.0",
+    "concurrently": "^9.2.1",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0"
+  }
+}

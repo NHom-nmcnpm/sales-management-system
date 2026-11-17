@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client"
+  output = "../generated/prisma"
+  moduleFormat = "esm"
+  generatedFileExtension = "ts"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  MANAGER
+  STAFF
+}
+
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  name String
+  passwordHash String
+  role Role @default(STAFF)
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+}

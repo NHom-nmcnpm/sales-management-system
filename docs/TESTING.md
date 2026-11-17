@@ -1,0 +1,19 @@
+# Kiểm thử
+
+Mỗi milestone chạy tập kiểm tra phù hợp, cập nhật kết quả tại PROGRESS.md.
+
+- npm run lint — ESLint JS/JSX.
+- npm run build — generate Prisma, kiểm tra syntax backend, Vite production bundle.
+- npm run db:smoke — Prisma recommended generator từ JavaScript kết nối PostgreSQL.
+- npm test — Vitest/Supertest. Integration chạy DB riêng sales_test, sẽ được thiết lập tại M1.
+- npm run test:e2e — Playwright, browser và cấu hình hoàn thiện tại M2.
+
+Unit kiểm tra Decimal, rounding, promotion/time boundaries, validation và hash. Integration kiểm tra auth/CSRF/RBAC/ownership, DB constraints, rollback, stock race và idempotency. E2E kiểm tra đăng nhập, quản trị, POS, tiền mặt/chuyển khoản, khuyến mại, khách lẻ/khách hồ sơ, report và in. Browser QA responsive 375/768/1280/1440, keyboard và trạng thái.
+
+Dữ liệu test nằm DB riêng, fixtures sinh mật khẩu lúc chạy. Secrets được lấy qua môi trường. Đối chiếu số liệu DB sau nghiệp vụ, không dùng mock để thay luồng hoàn thành.
+
+## Kết quả M0
+
+Prisma smoke native và `docker compose --profile tools run --rm --build smoke` đều đạt. Lint/build và health 1/1 đạt. Trong sandbox Windows các socket có thể trả EACCES, chạy các kiểm tra có network với quyền phù hợp. Cổng DB local 15432.
+
+Runtime audit 0. Advisory picomatch GHSA-fc5q-39xc-vjpf còn ở tooling Vite/Vitest, chưa có phiên bản vá trên registry tại lúc kiểm tra. Cấu hình glob nằm trong source do developer kiểm soát, không nhận từ người dùng sản phẩm.

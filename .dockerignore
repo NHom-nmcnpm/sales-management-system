@@ -1,0 +1,13 @@
+.git
+.agents
+node_modules
+frontend/node_modules
+backend/node_modules
+backend/generated
+frontend/dist
+.env
+.env.*
+!.env.example
+test-results
+playwright-report
+artifacts

@@ -148,6 +148,12 @@ vite.config.ts.timestamp-*
 # Astro generated types
 .astro/
 
+# Generated Prisma client and local verification artifacts
+backend/generated/
+test-results/
+playwright-report/
+artifacts/
+
 # Turbo Repo (https://turborepo.dev/)
 .turbo
 
