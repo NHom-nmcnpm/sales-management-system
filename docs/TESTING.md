@@ -17,3 +17,7 @@ Dữ liệu test nằm DB riêng, fixtures sinh mật khẩu lúc chạy. Secret
 Prisma smoke native và `docker compose --profile tools run --rm --build smoke` đều đạt. Lint/build và health 1/1 đạt. Trong sandbox Windows các socket có thể trả EACCES, chạy các kiểm tra có network với quyền phù hợp. Cổng DB local 15432.
 
 Runtime audit 0. Advisory picomatch GHSA-fc5q-39xc-vjpf còn ở tooling Vite/Vitest, chưa có phiên bản vá trên registry tại lúc kiểm tra. Cấu hình glob nằm trong source do developer kiểm soát, không nhận từ người dùng sản phẩm.
+
+## Kết quả M1–M2
+
+8 backend tests đạt, gồm constraints/seed/rollback và auth/CSRF/session/password/rate limit. Playwright auth 3/3 đạt cho hai vai trò và mobile keyboard. Test setup nạp .env rồi gán DATABASE_URL test trước import config. Cleanup xác minh current_database() khớp tên TEST_DATABASE_URL và kết thúc _test, chặn nhầm database ở tầng kết nối thực tế.

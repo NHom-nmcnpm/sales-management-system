@@ -6,6 +6,10 @@ export const testPassword = randomBytes(18).toString('base64url');
 const passwordHash = await bcrypt.hash(testPassword, 12);
 
 export async function clearDatabase() {
+  const database = await prisma.$queryRaw`SELECT current_database() AS name`;
+  if (database[0].name !== new URL(process.env.TEST_DATABASE_URL).pathname.slice(1) || !database[0].name.endsWith('_test')) {
+    throw new Error('Refusing to clear a database outside the dedicated test database.');
+  }
   await prisma.$transaction([
     prisma.stockMovement.deleteMany(), prisma.payment.deleteMany(), prisma.invoiceItem.deleteMany(),
     prisma.invoice.deleteMany(), prisma.authSession.deleteMany(), prisma.promotion.deleteMany(),
