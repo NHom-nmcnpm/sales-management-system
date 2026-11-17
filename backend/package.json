@@ -12,7 +12,7 @@
     "db:dev": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:smoke": "node scripts/smoke.js",
-    "test": "vitest run"
+    "test": "node scripts/prepare-test-db.js && vitest run"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",

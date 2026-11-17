@@ -3,7 +3,7 @@
 | Milestone | Trạng thái | Kiểm chứng |
 | --- | --- | --- |
 | M0 | Hoàn thành | Lint/build, health test 1/1, Prisma recommended generator từ JS chạy PostgreSQL native và Docker Linux đều đạt. Runtime audit 0. Git push develop thực hiện cùng commit milestone |
-| M1 | Chờ M0 | Schema/migration/seed |
+| M1 | Hoàn thành | Migration fresh ở sales và sales_test; seed 2 vai trò/16 sản phẩm; tests 4/4 (unique, FK, âm, rollback, seed lặp và ledger), lint đạt |
 | M2 | Chờ M1 | Auth và UI framework |
 | M3 | Chờ M2 | Sản phẩm/tồn |
 | M4 | Chờ M3 | Nhân viên/khách/ưu đãi |
@@ -16,3 +16,5 @@ Kế hoạch và bổ sung được phê duyệt. Source app JavaScript/JSX. Gen
 M0 đổi cổng DB local sang 15432 do Windows chặn 5432. Git/npm/socket local cần quyền thực thi ngoài sandbox của phiên này, các lệnh đã được phép chạy. .env được tạo bằng secret ngẫu nhiên và ignored.
 
 Audit M0 có 5 mục High cùng bắt nguồn từ picomatch <=4.0.7 trong Vite/Vitest/tinyglobby/fdir. Registry chưa có bản vá. Chỉ ảnh hưởng glob do người phát triển cung cấp trong công cụ build/test; không có đường nhập glob từ API/người dùng. `npm audit --omit=dev` đạt 0 vulnerabilities. Giữ phiên bản build hiện hành, theo dõi advisory GHSA-fc5q-39xc-vjpf, tránh downgrade/force fix sang Vite cũ.
+
+M0 đã push commit 98e6b8a lên origin/develop. M1 dùng schema 10 entities với FK restrict, unique/index và SQL CHECK. Seed dùng advisory lock/transaction, giữ các bản ghi đã sửa. Test DB bắt buộc tên kết thúc _test và tách DATABASE_URL. Mật khẩu fixture sinh runtime.

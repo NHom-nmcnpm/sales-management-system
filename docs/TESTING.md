@@ -5,7 +5,7 @@ Mỗi milestone chạy tập kiểm tra phù hợp, cập nhật kết quả t�
 - npm run lint — ESLint JS/JSX.
 - npm run build — generate Prisma, kiểm tra syntax backend, Vite production bundle.
 - npm run db:smoke — Prisma recommended generator từ JavaScript kết nối PostgreSQL.
-- npm test — Vitest/Supertest. Integration chạy DB riêng sales_test, sẽ được thiết lập tại M1.
+- npm test — tạo database riêng từ TEST_DATABASE_URL nếu thiếu, migrate và chạy Vitest/Supertest. Tên database phải kết thúc _test và khác DATABASE_URL.
 - npm run test:e2e — Playwright, browser và cấu hình hoàn thiện tại M2.
 
 Unit kiểm tra Decimal, rounding, promotion/time boundaries, validation và hash. Integration kiểm tra auth/CSRF/RBAC/ownership, DB constraints, rollback, stock race và idempotency. E2E kiểm tra đăng nhập, quản trị, POS, tiền mặt/chuyển khoản, khuyến mại, khách lẻ/khách hồ sơ, report và in. Browser QA responsive 375/768/1280/1440, keyboard và trạng thái.

@@ -24,4 +24,173 @@ model User {
   isActive Boolean @default(true)
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  sessions AuthSession[]
+  invoices Invoice[]
+  stockMovements StockMovement[]
+}
+
+enum DiscountType {
+  PERCENT
+  FIXED
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+}
+
+enum InvoiceStatus {
+  PAID
+}
+
+enum MovementKind {
+  OPENING
+  ADJUSTMENT
+  SALE
+}
+
+model AuthSession {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  csrfToken String
+  expiresAt DateTime @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([userId, expiresAt])
+}
+
+model Category {
+  id String @id @default(uuid())
+  name String @unique
+  description String @default("")
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  products Product[]
+}
+
+model Product {
+  id String @id @default(uuid())
+  sku String @unique
+  name String
+  description String @default("")
+  unit String @default("Cái")
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  price Decimal @db.Decimal(18, 0)
+  stock Int @default(0)
+  lowStockThreshold Int @default(10)
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  items InvoiceItem[]
+  movements StockMovement[]
+  @@index([categoryId, isActive])
+  @@index([name])
+}
+
+model Customer {
+  id String @id @default(uuid())
+  name String
+  phone String? @unique
+  email String?
+  address String @default("")
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  invoices Invoice[]
+  @@index([name])
+}
+
+model Promotion {
+  id String @id @default(uuid())
+  code String @unique
+  name String
+  discountType DiscountType
+  discountValue Decimal @db.Decimal(18, 2)
+  minSubtotal Decimal @default(0) @db.Decimal(18, 0)
+  maxDiscount Decimal? @db.Decimal(18, 0)
+  startsAt DateTime @db.Timestamptz(3)
+  endsAt DateTime @db.Timestamptz(3)
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  invoices Invoice[]
+  @@index([isActive, startsAt, endsAt])
+}
+
+model Invoice {
+  id String @id @default(uuid())
+  number Int @unique @default(autoincrement())
+  createdById String
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  customerId String?
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  customerSnapshot Json
+  promotionId String?
+  promotion Promotion? @relation(fields: [promotionId], references: [id], onDelete: Restrict)
+  promotionSnapshot Json?
+  subtotal Decimal @db.Decimal(18, 0)
+  discount Decimal @db.Decimal(18, 0)
+  total Decimal @db.Decimal(18, 0)
+  status InvoiceStatus @default(PAID)
+  idempotencyKey String
+  requestHash String
+  paidAt DateTime @default(now()) @db.Timestamptz(3)
+  items InvoiceItem[]
+  payment Payment?
+  movements StockMovement[]
+  @@unique([createdById, idempotencyKey])
+  @@index([paidAt])
+  @@index([createdById, paidAt])
+  @@index([customerId, paidAt])
+}
+
+model InvoiceItem {
+  id String @id @default(uuid())
+  invoiceId String
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  productId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  sku String
+  name String
+  unit String
+  unitPrice Decimal @db.Decimal(18, 0)
+  quantity Int
+  subtotal Decimal @db.Decimal(18, 0)
+  @@unique([invoiceId, productId])
+  @@index([productId])
+}
+
+model Payment {
+  id String @id @default(uuid())
+  invoiceId String @unique
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  method PaymentMethod
+  amount Decimal @db.Decimal(18, 0)
+  cashReceived Decimal? @db.Decimal(18, 0)
+  change Decimal @default(0) @db.Decimal(18, 0)
+  transferReference String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+}
+
+model StockMovement {
+  id String @id @default(uuid())
+  productId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  actorId String
+  actor User @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  invoiceId String?
+  invoice Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  kind MovementKind
+  delta Int
+  quantityAfter Int
+  reason String
+  operationKey String?
+  requestHash String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@unique([actorId, operationKey])
+  @@unique([invoiceId, productId])
+  @@index([productId, createdAt])
 }
